@@ -1,3 +1,5 @@
+import tweepy as tw
+import csv
 import re
 import pandas as pd
 import numpy as np
@@ -89,5 +91,45 @@ plt.ylabel('True Label')
 sentence = 'The Corona virus is a man made virus created in a Wuhan laboratory. Doesn’t @BillGates finance research at the Wuhan lab?'
 sentence = clean(sentence)
 vectorized_sentence = vectorizer.transform([sentence]).toarray()
-print(clf.predict(vectorized_sentence))
+#print(clf.predict(vectorized_sentence))
 
+
+auth = tw.OAuthHandler("5ghCjdJ3WMmrpKqcRVh7ZJiQr", "r0XlKhQQ2GZFtM8L9RU7lxc2qebAjetZugo3o9ZHtMIdJLJDr8")
+auth.set_access_token("1177476709-nUPM1SoN4lv8I1qJTELGeduWezuKgN2DGovfn9y", "BGzoLW9noV8txGij56D5TmRqzRB9oBrHPY2V3B0TTsRyM")
+
+api = tw.API(auth)
+
+public_tweets = api.home_timeline()
+
+csvFile = open('TweetsCovid.csv', 'a')
+csvWriter = csv.writer(csvFile)
+query_search = "#covid OR #quaretena OR #corona" + " -filter:retweets"
+
+for tweet in tw.Cursor(api.search,q=query_search).items(500):
+    print (tweet.created_at, tweet.text)
+    csvWriter.writerow([tweet.created_at, tweet.text.encode('utf-8')])
+
+
+#for tweet in cursor_tweets:
+#    print(tweet.created_at)
+#    print(tweet.text)
+
+#twkeys = tweet._json.keys()
+
+
+#tweets_dict = {}
+#tweets_dict = tweets_dict.fromkeys(twkeys)
+
+#or tweet in cursor_tweets:
+#    for key in tweets_dict.keys():
+ #       try:
+  #          twkey = tweet._json[key]
+   #         tweets_dict[key].append(twkey)
+    #    except KeyError:
+     #       twkey = ""
+      #      tweets_dict[key].append("")
+       # except:
+        #    tweets_dict[key].append("")
+
+
+#dfTweets.to_csv('TweetsCovid.csv', index = 'A')
