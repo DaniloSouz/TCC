@@ -15,13 +15,13 @@ from nltk.corpus import stopwords
 
 
 ##### Data collection & analysis
-df = pd.read_csv('covid_fake_news.csv')
+df = pd.read_csv('TweetsCovid2.csv')
 df.head()
 
 df = df.fillna('')
 
-df ['title_text_source'] = df ['title'] + '' + df ['text'] + '' + df ['source'] 
-df.head ()
+df ['text'] = df ['text'] + ''
+
 
 df = df[df['label']!='']
 
@@ -35,7 +35,7 @@ no_of_fakes = df.loc[df['label'] == 'FAKE'].count()[0]
 no_of_trues = df.loc[df['label'] == 'TRUE'].count()[0]
 
 
-stop_words = set(stopwords.words('english'))
+stop_words = set(stopwords.words('portuguese'))
 
 def clean(text):
     # Lowering letters
@@ -52,7 +52,10 @@ def clean(text):
     
     # Removing numbers
     text = re.sub('[^a-zA-Z]',' ',text)
-    
+
+    # Removendo quebras de linhas
+    text = text.rstrip('\n')
+
     word_tokens = word_tokenize(text)
     
     filtered_sentence = []
@@ -64,10 +67,10 @@ def clean(text):
     text = (' '.join(filtered_sentence))
     return text
 
-df['title_text_source'] = df['title_text_source'].apply(clean)
+df['text'] = df['text'].apply(clean)
 
 vectorizer = CountVectorizer()
-X = vectorizer.fit_transform(df['title_text_source'].values)
+X = vectorizer.fit_transform(df['text'].values)
 X = X.toarray()
 
 y = df['label'].values
@@ -76,6 +79,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_siz
 
 clf = MultinomialNB()
 clf.fit(X_train, y_train)
+
+print(clf.score(X_train, y_train))
+print(clf.score(X_test, y_test))
 
 predictions = clf.predict(X_test)
 #cm recebe a matriz de confusão onde passa os parametros da variável y_test e predections
@@ -92,44 +98,3 @@ sentence = 'The Corona virus is a man made virus created in a Wuhan laboratory. 
 sentence = clean(sentence)
 vectorized_sentence = vectorizer.transform([sentence]).toarray()
 #print(clf.predict(vectorized_sentence))
-
-
-auth = tw.OAuthHandler("5ghCjdJ3WMmrpKqcRVh7ZJiQr", "r0XlKhQQ2GZFtM8L9RU7lxc2qebAjetZugo3o9ZHtMIdJLJDr8")
-auth.set_access_token("1177476709-nUPM1SoN4lv8I1qJTELGeduWezuKgN2DGovfn9y", "BGzoLW9noV8txGij56D5TmRqzRB9oBrHPY2V3B0TTsRyM")
-
-api = tw.API(auth)
-
-public_tweets = api.home_timeline()
-
-csvFile = open('TweetsCovid.csv', 'a')
-csvWriter = csv.writer(csvFile)
-query_search = "#covid OR #quaretena OR #corona" + " -filter:retweets"
-
-for tweet in tw.Cursor(api.search,q=query_search).items(500):
-    print (tweet.created_at, tweet.text)
-    csvWriter.writerow([tweet.created_at, tweet.text.encode('utf-8')])
-
-
-#for tweet in cursor_tweets:
-#    print(tweet.created_at)
-#    print(tweet.text)
-
-#twkeys = tweet._json.keys()
-
-
-#tweets_dict = {}
-#tweets_dict = tweets_dict.fromkeys(twkeys)
-
-#or tweet in cursor_tweets:
-#    for key in tweets_dict.keys():
- #       try:
-  #          twkey = tweet._json[key]
-   #         tweets_dict[key].append(twkey)
-    #    except KeyError:
-     #       twkey = ""
-      #      tweets_dict[key].append("")
-       # except:
-        #    tweets_dict[key].append("")
-
-
-#dfTweets.to_csv('TweetsCovid.csv', index = 'A')
