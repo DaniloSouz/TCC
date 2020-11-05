@@ -4,6 +4,7 @@ import csv
 import re
 import pandas as pd
 import numpy as np
+import tkinter as tk
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,21 +13,22 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from tkinter import messagebox
 
 def clean(text):
-        # Lowering letters
+        # Passando para letra minuscula
         text = text.lower()
     
-        # Removing html tags
+        # Removendo tags em HTML
         text = re.sub(r'<[^>]*>', '', text)
     
-        # Removing twitter usernames
+        # Removendo o nome do usuário do twitter
         text = re.sub(r'@[A-Za-z0-9]+','',text)
     
-        # Removing urls
+        # Removendo URL
         text = re.sub('https?://[A-Za-z0-9]','',text)
     
-        # Removing numbers
+        # Removendo os números
         text = re.sub('[^a-zA-Z]',' ',text)
 
         # Removendo quebras de linhas
@@ -39,7 +41,7 @@ def clean(text):
             if word_token not in stop_words:
                 filtered_sentence.append(word_token)
     
-        # Joining words
+        # Concatenando
         text = (' '.join(filtered_sentence))
         return text
 
@@ -82,10 +84,12 @@ class TelaPrincipal:
             tela.fechar()
         if self.button == 'avaliar':
             textoavaliado = self.values['texto']
-            if (textoavaliado.find('covid') or textoavaliado.find('corona') or textoavaliado.find('quarentena')):
+            if ('covid' in textoavaliado or 'corona' in textoavaliado or 'quarentena' in textoavaliado or 
+                'Quarentena' in textoavaliado or 'Corona' in textoavaliado or 'Covid' in textoavaliado
+            ):
                 tela.validar(textoavaliado)
             else:
-                print ("Palavra Chave inválida")
+                messagebox.showwarning("Erro", "Palavra Chave inválida")
 
     def fechar(self):
         sg.WIN_CLOSED
@@ -101,19 +105,17 @@ class TelaPrincipal:
 
         clf = MultinomialNB()
         clf.fit(X_train, y_train)
-
-        print(clf.score(X_train, y_train))
-        print(clf.score(X_test, y_test))
-        
+        y = "\nPrecisão nos dados de treino: " + str(round(clf.score(X_train, y_train)*100, 2))
+        h = "Precisão nos dados de teste: " + str(round(clf.score(X_test, y_test)*100, 2))
         sentence = texto
         sentence = clean(sentence)
         vectorized_sentence = vectorizer.transform([sentence]).toarray()
-        print(clf.predict(vectorized_sentence)) 
+        j = "\n\nO texto digitado é possívelmente: " + str(clf.predict(vectorized_sentence))
+        j = re.sub(r"[']", "", j)
+        c = j.replace("[","")
+        k = c.replace("]","")
+        messagebox.showinfo("Detector de Fake News", h + y + k)
 
 
 tela = TelaPrincipal()
 tela.Iniciar()
-
-
-            
-    

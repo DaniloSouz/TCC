@@ -38,19 +38,19 @@ no_of_trues = df.loc[df['label'] == 'TRUE'].count()[0]
 stop_words = set(stopwords.words('portuguese'))
 
 def clean(text):
-    # Lowering letters
+    # Passando para letra minuscula
     text = text.lower()
     
-    # Removing html tags
+    # Removendo tags em HTML
     text = re.sub(r'<[^>]*>', '', text)
     
-    # Removing twitter usernames
+    # Removendo o nome do usuário do twitter
     text = re.sub(r'@[A-Za-z0-9]+','',text)
     
-    # Removing urls
+    # Removendo URL
     text = re.sub('https?://[A-Za-z0-9]','',text)
     
-    # Removing numbers
+    # Removendo os números
     text = re.sub('[^a-zA-Z]',' ',text)
 
     # Removendo quebras de linhas
@@ -63,7 +63,7 @@ def clean(text):
         if word_token not in stop_words:
             filtered_sentence.append(word_token)
     
-    # Joining words
+    # Juntando as palavras
     text = (' '.join(filtered_sentence))
     return text
 
