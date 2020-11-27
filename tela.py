@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-import tweepy as tw
 import csv
 import re
 import pandas as pd
@@ -14,6 +13,8 @@ from sklearn.metrics import confusion_matrix
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from tkinter import messagebox
+
+stop_words = set(stopwords.words('portuguese'))
 
 def clean(text):
         # Passando para letra minuscula
@@ -45,7 +46,7 @@ def clean(text):
         text = (' '.join(filtered_sentence))
         return text
 
-df = pd.read_csv('TweetsCovid2.csv')
+df = pd.read_csv('TweetsCovid.csv')
 df = df.fillna('')
 df ['text'] = df ['text'] + ''
 df = df[df['label']!='']
@@ -54,13 +55,11 @@ np.array(['Fake', 'TRUE', 'fake'], dtype=object)
 
 df.loc[df['label'] == 'fake', 'label'] = 'FAKE'
 df.loc[df['label'] == 'Fake', 'label'] = 'FAKE'
+df.loc[df['label'] == 'true', 'label'] = 'TRUE'
+df.loc[df['label'] == 'True', 'label'] = 'TRUE'
 
 no_of_fakes = df.loc[df['label'] == 'FAKE'].count()[0]
 no_of_trues = df.loc[df['label'] == 'TRUE'].count()[0]
-
-
-stop_words = set(stopwords.words('portuguese'))
-  
 
 df['text'] = df['text'].apply(clean)
 
