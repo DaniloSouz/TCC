@@ -109,7 +109,7 @@ class TelaPrincipal:
         sentence = texto
         sentence = clean(sentence)
         vectorized_sentence = vectorizer.transform([sentence]).toarray()
-        j = "\n\nO texto digitado é possívelmente: " + str(clf.predict(vectorized_sentence))
+        j = "\n\nO texto digitado é possivelmente: " + str(clf.predict(vectorized_sentence))
         j = re.sub(r"[']", "", j)
         c = j.replace("[","")
         k = c.replace("]","")
